@@ -1,0 +1,155 @@
+// Simuler les variables globales
+DÉFINIR Coup[1..255], entier
+Séquence <-- 0
+Record <-- 0
+Réponse <-- ""
+
+MÉTHODE : Chaine ChercheCouleur(Couleur) // Déclaration
+DÉBUT
+	SELON Couleur CHOISIR
+		1 : CouleurChaine <-- "Vert"
+		2 : CouleurChaine <-- "Rouge"
+		3 : CouleurChaine <-- "Jaune"
+		4 : CouleurChaine <-- "Bleu"
+		5 : CouleurChaine <-- "Blanc"
+		AUTREMENT: RIEN
+	FIN SELON
+	RETOURNE CouleurChaine
+FIN
+
+MÉTHODE : Aucun AfficherJeu(Coup) // Déclaration
+DÉBUT
+	AFFICHER "============= Jeu de Simon ============"
+	POUR Ligne <-- 1, 3, PAS 1
+		SI Ligne N'EST PAS ÉGALE À 2 ALORS
+			POUR Cpt <-- 1, 4, PAS 1
+				SI Coup N'EST PAS ÉGALE À Cpt ALORS
+					POUR Cpt1 <-- 1, 9, PAS 1
+						COULEUR CONSOLE = ChercheCouleur(Cpt)
+						AFFICHER " "
+					FIN POUR
+					// COULEUR CONSOLE REMIS A DÉFAULT
+					SI Cpt N'EST PAS ÉGALE À 4 ALORS
+						AFFICHER "|"
+					FIN SI
+				SINON
+					POUR Cpt1 <-- 1, 9, PAS 1
+						COULEUR CONSOLE = ChercheCouleur(5)
+						AFFICHER " "
+					FIN POUR
+					// COULEUR CONSOLE REMIS A DÉFAULT
+					SI Cpt N'EST PAS ÉGALE À 4 ALORS
+						AFFICHER "|"
+					FIN SI
+			FIN POUR
+			AFFICHER "" // Saut de Ligne
+			// COULEUR CONSOLE REMIS A DÉFAULT
+		SINON
+			POUR Cpt <-- 1, 4, PAS 1
+				SI Coup N'EST PAS ÉGALE À Cpt ALORS
+					POUR <-- 1, 4, PAS 1
+						COULEUR CONSOLE = ChercheCouleur(Cpt)
+						AFFICHER " "
+					FIN POUR
+					COULEUR CONSOLE = NOIR
+					AFFICHER Cpt
+					POUR <-- 1, 4, PAS 1
+						COULEUR CONSOLE = ChercheCouleur(Cpt)
+						AFFICHER " "
+					FIN POUR
+					SI Cpt N'EST PAS ÉGALE À 4 ALORS
+						AFFICHER "|"
+					FIN SI
+				SINON
+					POUR <-- 1, 4, PAS 1
+						COULEUR CONSOLE = ChercheCouleur(5)
+						AFFICHER " "
+					FIN POUR
+					COULEUR CONSOLE = NOIR
+					AFFICHER Cpt
+					POUR <-- 1, 4, PAS 1
+						COULEUR CONSOLE = ChercheCouleur(5)
+						AFFICHER " "
+					FIN POUR
+					SI Cpt N'EST PAS ÉGALE À 4 ALORS
+						AFFICHER "|"
+					FIN SI
+				FIN SI
+			FIN POUR
+			AFFICHER "" // Saut de Ligne
+			// COULEUR CONSOLE REMIS A DÉFAULT
+		FIN SI
+	FIN POUR
+	AFFICHER "======================================="
+	SI Coup EST PLUS PETIT QUE OU ÉGALE À 4 ALORS
+		AFFICHER "En cours d'animation..."
+	FIN SI			
+FIN
+
+MÉTHODE : Aucun FaireCoup() // Déclaration
+DÉBUT
+	POUR Cpt <-- 0, 255, PAS 1
+		Coup <-- Random(1, 5)
+	FIN POUR
+FIN
+
+MÉTHODE : Aucun RoulerJeu() // Déclaration
+DÉBUT
+	FaireCoup()
+	Séquence <-- 0
+	Réponse <-- ""
+	VraiSéquence <-- ""
+	Valide <-- FAUX
+	RÉPÉTER
+		POUR Cpt <-- 0, Séquence PAS 1
+			AfficherJeu(Coup[Cpt])
+			ATTENDRE 1,5 SECONDS
+		FIN POUR
+		VraiSéquence += Coup[Séquence]
+		AfficherJeu(6)
+		AFFICHER "Animation teminée"
+		AFFICHER "" // Saut de ligne
+		AFFICHER "Entrer votre séquence: "
+		DEMANDER Réponse
+		SI Réponse EST ÉGALE À 'q' ALORS
+			// Quitte méthodes
+		FIN SI
+		SI Réponse EST ÉGALE À VraiSéquence ALORS
+			AFFICHER "BRAVO! Vous avez suivi la séquence! On ajoute un tour."
+			AFFICHER "APPUYEZ SUR UNE TOUCHE..."
+			PAUSE
+			Séquence += 1
+		SINON
+			SI Séquence > Record ALORS
+				Record <-- Séquence
+			FIN SI
+			AFFICHER "ERREUR: Mauvaise séquence!"
+			AFFICHER "Nombre de fois trouvé...........: " + Séquence
+			AFFICHER "Record du nombre de fois trouvé.:" + Record
+			VALIDE = VRAI
+	FIN TANT QUE Valide = FAUX
+FIN
+
+PROGRAMME PRINCIPALE
+DÉBUT
+	TITRE CONSOLE <-- "Jeu de Simon"
+	AfficherJeu(6)
+	AFFICHER "Appuyez sur une touche pour continuer..."
+	PAUSE
+	RoulerJeu()
+	RÉPÉTER
+		SI Réponse EST ÉGALE À 'q' ALORS
+			AFFICHER "Au Revoir!"
+		FIN SI
+		AFFICHER "Voulez-vous recommencer (o/n)?: "
+		DEMANDER Choix
+		SI Choix EST ÉGALE À 'o' ALORS
+			RoulerJeu()
+		SINON SI Réponse EST ÉGALE À 'q' OU Choix EST ÉGALE À 'n' ALORS
+			AFFICHER "Au Revoir!"
+			Valide <-- VRAI
+		SINON
+			AFFICHER "ERREUR: Mauvais choix veuillez réessayer!"
+		FIN SI
+	FIN TANT QUE Valide = FAUX
+FIN
